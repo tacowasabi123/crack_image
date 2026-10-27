@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>메종 레브</title>
-<meta name="description" content="한 명씩 문을 여는 메이드 카페, 메종 레브">
+<meta name="description" content="메이드들이 기다리는 카페, 메종 레브">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Song+Myung&display=swap" rel="stylesheet">
@@ -146,11 +146,29 @@ section.block:nth-of-type(even){background:var(--paper-2)}
 .maid .line{margin:8px 6px 0;font-size:.95rem;color:var(--ink-soft);word-break:keep-all}
 .maid.open .frame{transition:transform .3s ease,box-shadow .3s ease}
 .maid.open:hover .frame,.maid.open:focus-visible .frame{transform:translateY(-4px);box-shadow:0 16px 34px rgba(90,63,110,.3)}
-.go{display:inline-block;margin-top:10px;padding:6px 16px;border-radius:999px;background:var(--rose);color:#fff;font-size:.92rem}
+.frame{display:block;width:100%;padding:0;font:inherit;color:inherit;cursor:pointer}
+.frame:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(90,63,110,.3)}
+.maid .frame{transition:transform .3s ease,box-shadow .3s ease}
+.modal{position:fixed;inset:0;z-index:120;background:rgba(40,24,52,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px}
+.modal[hidden]{display:none}
+.modal .card{position:relative;width:min(460px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4);border:2px solid var(--brass)}
+.modal .x{position:absolute;top:12px;right:12px;z-index:2;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.92);color:#3b2a45;font-size:22px;line-height:1;cursor:pointer}
+.modal .pic{aspect-ratio:4/4.3;background:linear-gradient(160deg,var(--lav),var(--brass-soft));overflow:hidden}
+.modal .pic img{width:100%;height:100%;object-fit:cover;object-position:50% 15%;display:block}
+.modal .body{padding:20px 24px 26px}
+.modal h3{font-size:1.7rem;color:var(--wine)}
+.modal .age{color:var(--ink-soft);margin-top:2px}
+.modal .nick{margin:8px 0 6px;color:var(--rose);font-weight:700}
+.modal h4{margin:16px 0 2px;font-size:.88rem;font-weight:400;color:var(--wine);border-top:1px solid var(--line);padding-top:12px;letter-spacing:.04em}
+.modal p{margin:0;font-size:.98rem}
+.go.big{display:block;text-align:center;margin-top:22px;padding:12px;font-size:1rem;text-decoration:none}
+.go.off{background:var(--ink-soft);opacity:.55;cursor:not-allowed}
+.go{display:inline-block;text-decoration:none;margin-top:10px;padding:6px 16px;border-radius:999px;background:var(--rose);color:#fff;font-size:.92rem}
 :root[data-theme="dark"] .go{color:#1b1215}
 
 /* 휴무: 이미지는 보이지만 반투명 검정으로 덮음 */
-.maid.closed{cursor:not-allowed}
+.maid.closed{cursor:default}
+.maid.closed .frame{cursor:pointer}
 .maid.closed .frame::after{content:"";position:absolute;inset:0;z-index:2;background:rgba(24,14,34,.62)}
 .maid.closed .frame img{filter:grayscale(.4)}
 .maid.closed .plate{opacity:.7}
@@ -243,8 +261,8 @@ footer{background:var(--velvet-deep);color:#e7d3e2;padding:34px 0 40px;text-alig
         <p id="cafeTagline"></p>
         <p id="cafeSub"></p>
       </div>
-      <aside class="board" aria-label="오늘의 영업">
-        <h3>오늘의 영업</h3>
+      <aside class="board" aria-label="카페 정보">
+        <h3>카페 정보</h3>
         <dl id="todayBoard"></dl>
       </aside>
     </div>
@@ -264,8 +282,8 @@ footer{background:var(--velvet-deep);color:#e7d3e2;padding:34px 0 40px;text-alig
   <section class="block" id="maids">
     <div class="wrap">
       <div class="head">
-        <h2>오늘의 메이드</h2>
-        <p>지금 문을 연 메이드를 누르면 이야기가 시작됩니다. 휴무 중인 메이드는 다음 이야기에서 차례로 문을 엽니다.</p>
+        <h2>메이드 소개</h2>
+        <p>사진을 누르면 소개를 볼 수 있고, "이야기 시작하기"를 누르면 크랙 스토리로 이동합니다.</p>
         <div class="rule"></div>
       </div>
       <div class="staff" id="staff"></div>
@@ -299,6 +317,20 @@ footer{background:var(--velvet-deep);color:#e7d3e2;padding:34px 0 40px;text-alig
   <div class="wrap">이 카페와 등장인물은 모두 가상의 설정입니다. 등장인물은 모두 성인입니다.</div>
 </footer>
 
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mName">
+  <div class="card">
+    <button type="button" class="x" id="mClose" aria-label="닫기">×</button>
+    <div class="pic"><img id="mImg" alt=""></div>
+    <div class="body">
+      <h3 id="mName"></h3>
+      <div class="age" id="mAge"></div>
+      <div class="nick" id="mNick"></div>
+      <div id="mBody"></div>
+      <a class="go big" id="mGo" href="#" rel="noopener">이야기 시작하기</a>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -313,23 +345,29 @@ const SITE = {
 const CAFE = {
   name: "메종 레브",
   tagline: "문을 열면, 한 사람이 기다리고 있습니다.",
-  sub: "메이드는 한 명씩 차례로 문을 엽니다. 오늘 문을 연 메이드에게 말을 걸어 보세요.",
-  about: "골목 끝, 레이스 커튼이 걸린 분홍색 문 안쪽에 있는 작은 카페입니다. 메이드마다 하나씩 이야기를 가지고 있고, 이야기는 한 편씩 차례로 열립니다.",
+  sub: "메이드들이 이곳에서 손님을 기다립니다. 마음에 드는 메이드에게 말을 걸어 보세요.",
+  about: "골목 끝, 레이스 커튼이 걸린 분홍색 문 안쪽에 있는 작은 카페입니다. 메이드마다 저마다의 이야기를 가지고 있습니다.",
   manners: [
     ["메이드의 이름을 불러 주세요.", "이름을 불러 주면 메이드가 먼저 다가옵니다."],
     ["억지로 묻지 마세요.", "말하고 싶어질 때까지 기다리는 것도 손님의 몫입니다."],
-    ["휴무 중인 메이드는 쉬게 해 주세요.", "다음 이야기에서 문을 열 때 다시 만날 수 있습니다."]
+    ["다른 손님도 배려해 주세요.", "이곳에서는 누구나 편하게 쉬다 갈 수 있어야 합니다."]
   ]
 };
 
-/* open:true 인 메이드만 누를 수 있고, 누르면 storyUrl(크랙 스토리 주소)로 이동합니다.
+/* open:true 인 메이드만 "이야기 시작하기"가 켜지고, storyUrl(크랙 스토리 주소)로 이동합니다.
    새 이야기를 만들면 해당 메이드의 open 을 true 로 바꾸고 storyUrl 만 채우세요. */
+/* 사진을 누르면 소개 팝업이 열립니다. (nick~dislike 는 지금은 샘플이니 설정에 맞게 바꿔 주세요) */
 const STAFF = [
-  { name:"한예슬",          role:"신입 메이드", line:"어, 어서 오세요, 주인님♡", image:"한예슬", open:true,  storyUrl:"#" },
-  { name:"오세린",          role:"선배 메이드", line:"", image:"오세린", open:false, storyUrl:"" },
-  { name:"이지혜",          role:"선배 메이드", line:"", image:"이지혜", open:false, storyUrl:"" },
-  { name:"강다은 · 강다인", role:"선배 메이드 (쌍둥이)", line:"", image:"강다은과 강다인", open:false, storyUrl:"" },
-  { name:"한소연",          role:"점장",       line:"", image:"한소연", open:false, storyUrl:"" }
+  { name:"한예슬",          age:24, line:"어, 어서 오세요, 주인님♡", image:"한예슬", open:true,  storyUrl:"#",
+    nick:"서툴지만 열심히인 메이드", personality:"샘플: 아직 일이 서툴러 자주 허둥대지만, 손님 앞에서는 끝까지 웃으려고 애쓴다.", like:"샘플: 칭찬, 달콤한 디저트", dislike:"샘플: 쟁반을 떨어뜨리는 일" },
+  { name:"오세린",          age:26, line:"", image:"오세린", open:false, storyUrl:"",
+    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
+  { name:"이지혜",          age:22, line:"", image:"이지혜", open:false, storyUrl:"",
+    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
+  { name:"강다은과 강다인", age:25, line:"", image:"강다은과 강다인", open:false, storyUrl:"",
+    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
+  { name:"한소연",          age:30, line:"", image:"한소연", open:false, storyUrl:"",
+    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" }
 ];
 
 const MENU = [
@@ -357,12 +395,11 @@ const MENU_NOTE = "표시된 메뉴와 가격은 예시입니다. 실제 이야�
 
 const TODAY = [
   ["영업 시간", "낮 12시 ~ 저녁 8시"],
-  ["휴무일", "매주 화요일"],
-  ["오늘 문을 연 메이드", () => STAFF.filter(s => s.open).map(s => s.name).join(", ") || "아직 없음"]
+  ["찾아오는 길", "골목 끝, 분홍색 문"]
 ];
 const INFO = [
-  { title:"영업 시간", list:["평일  12:00 ~ 20:00","주말  11:00 ~ 21:00","매주 화요일 휴무"] },
-  { title:"이용 안내", list:["메이드와의 대화는 이야기를 통해 이뤄집니다.","메이드를 누르면 크랙 스토리로 이동합니다.","새 이야기가 열릴 때마다 메이드가 한 명씩 늘어납니다."] }
+  { title:"영업 시간", list:["평일  12:00 ~ 20:00","주말  11:00 ~ 21:00"] },
+  { title:"이용 안내", list:["메이드와의 대화는 크랙 스토리에서 이뤄집니다.","메이드 사진을 누르면 소개를 볼 수 있습니다."] }
 ];
 
 /* =========================================================
@@ -393,32 +430,61 @@ function toast(msg){
 }
 function imgSrc(name){ return SITE.imageBase + encodeURIComponent(name) + "." + SITE.imageExt; }
 
-$("staff").innerHTML = STAFF.map((s, i) => {
-  const inner = `
+$("staff").innerHTML = STAFF.map((s, i) => `
+  <div class="maid ${s.open ? "open" : "closed"}">
     ${s.open ? "" : `<span class="tag">잠시 휴무</span>`}
-    <div class="frame">
+    <button type="button" class="frame" data-i="${i}" aria-label="${s.name} 소개 보기">
       <div class="ph" aria-hidden="true">${s.name.charAt(0)}</div>
       <img src="${imgSrc(s.image)}" alt="${s.name} 프로필" loading="lazy" onerror="this.remove()">
-    </div>
-    <div class="plate"><strong>${s.name}</strong><span>${s.role}</span></div>
-    ${s.open && s.line ? `<p class="line">${s.line}</p>` : ""}
-    ${s.open ? `<span class="go">이야기 시작하기</span>` : ""}`;
-  return s.open
-    ? `<a class="maid open" href="${s.storyUrl}" target="_blank" rel="noopener" aria-label="${s.name}, 이야기 시작하기">${inner}</a>`
-    : `<div class="maid closed" role="button" tabindex="0" data-i="${i}" aria-label="${s.name}, 잠시 휴무 중">${inner}</div>`;
-}).join("");
+    </button>
+    <div class="plate"><strong>${s.name}</strong><span>${s.age}세</span></div>
+    ${s.open ? `<a class="go" href="${s.storyUrl}" target="_blank" rel="noopener">이야기 시작하기</a>` : ""}
+  </div>`).join("");
 
-document.querySelectorAll(".maid.closed").forEach(el => {
-  const say = () => toast(STAFF[el.dataset.i].name + "은(는) 잠시 쉬는 중입니다. 다음 이야기에서 문을 엽니다.");
-  el.addEventListener("click", say);
-  el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); say(); } });
-});
+// 소개 팝업
+const modal = $("modal");
+let lastFocus = null;
+function openMaid(i, fromHash){
+  const s = STAFF[i]; if (!s) return;
+  lastFocus = document.activeElement;
+  $("mImg").src = imgSrc(s.image); $("mImg").alt = s.name;
+  $("mName").textContent = s.name;
+  $("mAge").textContent = s.age + "세";
+  $("mNick").textContent = s.nick || "";
+  $("mBody").innerHTML = [["성격", s.personality], ["좋아하는 것", s.like], ["싫어하는 것", s.dislike]]
+    .filter(r => r[1]).map(r => `<h4>${r[0]}</h4><p>${r[1]}</p>`).join("");
+  const go = $("mGo");
+  if (s.open) { go.href = s.storyUrl; go.textContent = "이야기 시작하기"; go.classList.remove("off"); go.removeAttribute("aria-disabled"); go.target = "_blank"; }
+  else { go.removeAttribute("href"); go.textContent = "잠시 휴무 중"; go.classList.add("off"); go.setAttribute("aria-disabled","true"); }
+  modal.hidden = false; document.body.style.overflow = "hidden";
+  $("mClose").focus();
+  if (!fromHash) history.replaceState(null, "", "#maid-" + encodeURIComponent(s.name));
+}
+function closeMaid(){
+  if (modal.hidden) return;
+  modal.hidden = true; document.body.style.overflow = "";
+  if (location.hash.startsWith("#maid-")) history.replaceState(null, "", location.pathname + location.search + "#maids");
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+document.querySelectorAll(".frame").forEach(el => el.addEventListener("click", () => openMaid(+el.dataset.i)));
+$("mClose").addEventListener("click", closeMaid);
+modal.addEventListener("click", e => { if (e.target === modal) closeMaid(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMaid(); });
+$("mGo").addEventListener("click", e => { if ($("mGo").classList.contains("off")) e.preventDefault(); });
+function openFromHash(){
+  const m = decodeURIComponent(location.hash).match(/^#maid-(.+)$/);
+  if (!m) return;
+  const i = STAFF.findIndex(s => s.name === m[1]);
+  if (i >= 0) { gate.classList.add("gone"); openMaid(i, true); }
+}
 
 // 입장 화면
 const gate = $("gate");
 function openGate(){ gate.classList.add("gone"); try{ sessionStorage.setItem("maid-entered","1"); }catch(e){} }
 try{ if (sessionStorage.getItem("maid-entered")) gate.classList.add("gone"); }catch(e){}
 $("enter").addEventListener("click", openGate);
+openFromHash();
+addEventListener("hashchange", openFromHash);
 
 // 화면 밝기
 const root = document.documentElement;
