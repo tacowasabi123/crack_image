@@ -146,8 +146,8 @@ section.block:nth-of-type(even){background:var(--paper-2)}
 .maid .line{margin:8px 6px 0;font-size:.95rem;color:var(--ink-soft);word-break:keep-all}
 .maid.open .frame{transition:transform .3s ease,box-shadow .3s ease}
 .maid.open:hover .frame,.maid.open:focus-visible .frame{transform:translateY(-4px);box-shadow:0 16px 34px rgba(90,63,110,.3)}
-.frame{display:block;width:100%;padding:0;font:inherit;color:inherit;cursor:pointer}
-.frame:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(90,63,110,.3)}
+button.frame{display:block;width:100%;padding:0;font:inherit;color:inherit;cursor:pointer}
+button.frame:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(90,63,110,.3)}
 .maid .frame{transition:transform .3s ease,box-shadow .3s ease}
 .modal{position:fixed;inset:0;z-index:120;background:rgba(40,24,52,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px}
 .modal[hidden]{display:none}
@@ -168,7 +168,6 @@ section.block:nth-of-type(even){background:var(--paper-2)}
 
 /* 휴무: 이미지는 보이지만 반투명 검정으로 덮음 */
 .maid.closed{cursor:default}
-.maid.closed .frame{cursor:pointer}
 .maid.closed .frame::after{content:"";position:absolute;inset:0;z-index:2;background:rgba(24,14,34,.62)}
 .maid.closed .frame img{filter:grayscale(.4)}
 .maid.closed .plate{opacity:.7}
@@ -354,18 +353,19 @@ const CAFE = {
 
 /* open:true 인 메이드만 "이야기 시작하기"가 켜지고, storyUrl(크랙 스토리 주소)로 이동합니다.
    새 이야기를 만들면 해당 메이드의 open 을 true 로 바꾸고 storyUrl 만 채우세요. */
-/* 사진을 누르면 소개 팝업이 열립니다. (nick~dislike 는 지금은 샘플이니 설정에 맞게 바꿔 주세요) */
+/* 문을 연(open:true) 메이드만 사진을 누르면 소개 팝업이 열리고, "이야기 시작하기"가 크랙 스토리(storyUrl)로 이동합니다.
+   tag 는 나이 옆에 붙는 표시입니다. (예: 23세/M)
+   새 이야기를 만들면 해당 메이드의 open 을 true 로 바꾸고, storyUrl 과 소개(nick~dislike)를 채우세요. */
 const STAFF = [
-  { name:"한예슬",          age:24, line:"어, 어서 오세요, 주인님♡", image:"한예슬", open:true,  storyUrl:"#",
-    nick:"서툴지만 열심히인 메이드", personality:"샘플: 아직 일이 서툴러 자주 허둥대지만, 손님 앞에서는 끝까지 웃으려고 애쓴다.", like:"샘플: 칭찬, 달콤한 디저트", dislike:"샘플: 쟁반을 떨어뜨리는 일" },
-  { name:"오세린",          age:26, line:"", image:"오세린", open:false, storyUrl:"",
-    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
-  { name:"이지혜",          age:22, line:"", image:"이지혜", open:false, storyUrl:"",
-    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
-  { name:"강다은과 강다인", age:25, line:"", image:"강다은과 강다인", open:false, storyUrl:"",
-    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" },
-  { name:"한소연",          age:30, line:"", image:"한소연", open:false, storyUrl:"",
-    nick:"샘플 한 줄 소개", personality:"샘플: 성격 소개가 들어갑니다.", like:"샘플", dislike:"샘플" }
+  { name:"한예슬", age:23, tag:"M", line:"어, 어서 오세요, 주인님♡", image:"한예슬", open:true, storyUrl:"https://share.crack.wrtn.ai/xab7mnu",
+    nick:"서툴러도 끝까지 웃는 신입 메이드",
+    personality:"아직 일이 서툴러 자주 허둥대지만, 주인님 앞에서는 끝까지 웃으려고 애쓴다. 칭찬을 받으면 금방 얼굴이 풀리고, 주인님이 시키는 일이라면 부끄러워하면서도 거절하지 못한다.",
+    like:"칭찬과 쓰다듬기, 달콤한 디저트, 주인님이 이름을 불러 주는 것",
+    dislike:"자신의 실수, 자신을 앞에 두고 다른 데를 바라보는 것" },
+  { name:"오세린", age:26, tag:"S", line:"", image:"오세린", open:false, storyUrl:"", nick:"", personality:"", like:"", dislike:"" },
+  { name:"이지혜", age:22, tag:"얀데레", line:"", image:"이지혜", open:false, storyUrl:"", nick:"", personality:"", like:"", dislike:"" },
+  { name:"강다은과 강다인", age:25, tag:"2대1 하렘", line:"", image:"강다은과 강다인", open:false, storyUrl:"", nick:"", personality:"", like:"", dislike:"" },
+  { name:"한소연", age:30, tag:"NTL", line:"", image:"한소연", open:false, storyUrl:"", nick:"", personality:"", like:"", dislike:"" }
 ];
 
 const MENU = [
@@ -431,11 +431,11 @@ function imgSrc(name){ return SITE.imageBase + encodeURIComponent(name) + "." + 
 $("staff").innerHTML = STAFF.map((s, i) => `
   <div class="maid ${s.open ? "open" : "closed"}">
     ${s.open ? "" : `<span class="tag">잠시 휴무</span>`}
-    <button type="button" class="frame" data-i="${i}" aria-label="${s.name} 소개 보기">
+    ${s.open ? `<button type="button" class="frame" data-i="${i}" aria-label="${s.name} 소개 보기">` : `<div class="frame">`}
       <div class="ph" aria-hidden="true">${s.name.charAt(0)}</div>
       <img src="${imgSrc(s.image)}" alt="${s.name} 프로필" loading="lazy" onerror="this.remove()">
-    </button>
-    <div class="plate"><strong>${s.name}</strong><span>${s.age}세</span></div>
+    ${s.open ? `</button>` : `</div>`}
+    <div class="plate"><strong>${s.name}</strong><span>${s.age}세/${s.tag}</span></div>
     ${s.open ? `<a class="go" href="${s.storyUrl}" target="_blank" rel="noopener">이야기 시작하기</a>` : ""}
   </div>`).join("");
 
@@ -443,11 +443,11 @@ $("staff").innerHTML = STAFF.map((s, i) => `
 const modal = $("modal");
 let lastFocus = null;
 function openMaid(i, fromHash){
-  const s = STAFF[i]; if (!s) return;
+  const s = STAFF[i]; if (!s || !s.open) return;   // 잠긴 메이드는 팝업이 열리지 않습니다
   lastFocus = document.activeElement;
   $("mImg").src = imgSrc(s.image); $("mImg").alt = s.name;
   $("mName").textContent = s.name;
-  $("mAge").textContent = s.age + "세";
+  $("mAge").textContent = s.age + "세/" + s.tag;
   $("mNick").textContent = s.nick || "";
   $("mBody").innerHTML = [["성격", s.personality], ["좋아하는 것", s.like], ["싫어하는 것", s.dislike]]
     .filter(r => r[1]).map(r => `<h4>${r[0]}</h4><p>${r[1]}</p>`).join("");
@@ -464,7 +464,7 @@ function closeMaid(){
   if (location.hash.startsWith("#maid-")) history.replaceState(null, "", location.pathname + location.search + "#maids");
   if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
-document.querySelectorAll(".frame").forEach(el => el.addEventListener("click", () => openMaid(+el.dataset.i)));
+document.querySelectorAll("button.frame").forEach(el => el.addEventListener("click", () => openMaid(+el.dataset.i)));
 $("mClose").addEventListener("click", closeMaid);
 modal.addEventListener("click", e => { if (e.target === modal) closeMaid(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeMaid(); });
