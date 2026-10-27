@@ -389,7 +389,7 @@ const MENU = [
     ["오늘의 한마디 카드", "2,000", ""]
   ]}
 ];
-const MENU_NOTE = "표시된 메뉴와 가격은 예시입니다. 실제 이야기 속 설정에 맞게 바꿔 주세요.";
+const MENU_NOTE = "";   // 메뉴 아래에 넣을 안내 문구 (비워 두면 표시되지 않습니다)
 
 const TODAY = [
   ["영업 시간", "낮 12시 ~ 저녁 8시"],
@@ -412,7 +412,7 @@ $("cafeSub").textContent = CAFE.sub;
 $("aboutText").textContent = CAFE.about;
 document.title = CAFE.name;
 $("manners").innerHTML = CAFE.manners.map(m => `<li><b>${m[0]}</b> ${m[1]}</li>`).join("");
-$("menuNote").textContent = MENU_NOTE;
+$("menuNote").textContent = MENU_NOTE; $("menuNote").hidden = !MENU_NOTE;
 $("todayBoard").innerHTML = TODAY.map(t => `<dt>${t[0]}</dt><dd>${typeof t[1]==="function"?t[1]():t[1]}</dd>`).join("");
 $("info").innerHTML = INFO.map(b => `<div class="sheet"><h3>${b.title}</h3><ul>${b.list.map(l=>`<li>${l}</li>`).join("")}</ul></div>`).join("");
 $("menuList").innerHTML = MENU.map(g => `
