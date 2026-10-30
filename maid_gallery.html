@@ -22,8 +22,8 @@
   const CAFE_NAME     = "Love For You";
   const CHARACTERS    = [
     "한예슬",
-    "오세린",
-    "이지혜",
+    // "오세린",
+    // "이지혜",
     // "강다은과 강다인",
     // "한소연",
   ];
@@ -190,6 +190,7 @@
   <input type="text" id="searchBox" placeholder="파일명 검색 (예: 평상시, 눈치)">
   <button class="action" id="resetBtn">검색 초기화</button>
   <button class="action" id="copyAllBtn">현재 목록 전체 복사</button>
+  <button class="action" id="listBtn" title="프롬프트에 넣을 짧은 목록(앞부분 주소 + 파일 이름)을 복사합니다">프롬프트용 목록 복사</button>
 </div>
 <div class="status" id="statusLine">불러오는 중...</div>
 
@@ -342,6 +343,26 @@
     navigator.clipboard.writeText(text).then(() => {
       copyAllBtn.textContent = '복사됨!';
       setTimeout(() => { copyAllBtn.textContent = '현재 목록 전체 복사'; }, 1200);
+    });
+  });
+
+  // 프롬프트용 줄임 목록: 앞부분 주소를 한 번만 적고, 파일 이름은 한 줄에 하나씩 적습니다.
+  // 파일 이름의 공백 등은 주소에서 깨지지 않도록 미리 변환해 둡니다.
+  const listBtn = document.getElementById('listBtn');
+  function safeName(filename) {
+    return filename.replace(/[ %#?()\[\]{}]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  }
+  function promptList() {
+    if (!filteredFiles.length) return '';
+    const head = `이미지 주소 앞부분: ${codeBase(filteredFiles[0])}\n사용법: ![파일이름](앞부분+아래 파일이름) 형태로 이미지를 출력한다. 파일 이름은 아래 그대로, 글자 하나도 바꾸지 않고 붙인다.\n`;
+    return head + filteredFiles.map(f => safeName(f.name)).join('\n');
+  }
+  listBtn.addEventListener('click', () => {
+    const text = promptList();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      listBtn.textContent = `복사됨! (${text.length.toLocaleString()}자)`;
+      setTimeout(() => { listBtn.textContent = '프롬프트용 목록 복사'; }, 2500);
     });
   });
 
