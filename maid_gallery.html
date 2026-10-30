@@ -22,11 +22,13 @@
   const CAFE_NAME     = "Love For You";
   const CHARACTERS    = [
     "한예슬",
-    // "오세린",
-    // "이지혜",
+    "오세린",
+    "이지혜",
     // "강다은과 강다인",
     // "한소연",
   ];
+  // 파일 이름 앞부분이 다르더라도 한 탭으로 모아 보여 주고 싶을 때 씁니다. (앞부분 이름 → 탭 이름)
+  const TAB_ALIASES   = { "강다은": "강다은과 강다인", "강다인": "강다은과 강다인" };
   const GITHUB_USER   = "tacowasabi123";          // 깃허브 아이디
   const GITHUB_REPO   = "crack_image";            // 레포지토리 이름
   const BRANCH        = "main";                   // 보통 main
@@ -190,6 +192,7 @@
   <input type="text" id="searchBox" placeholder="파일명 검색 (예: 평상시, 눈치)">
   <button class="action" id="resetBtn">검색 초기화</button>
   <button class="action" id="copyAllBtn">현재 목록 전체 복사</button>
+  <button class="action" id="listBtn" title="프롬프트에 넣을 짧은 목록(앞부분 주소 + 파일 이름)을 복사합니다">프롬프트용 목록 복사</button>
 </div>
 <div class="status" id="statusLine">불러오는 중...</div>
 
@@ -217,7 +220,9 @@
   let allFiles = [];       // GitHub에서 가져온 전체 이미지 목록
   let filteredFiles = [];  // 검색 결과
   // 주소 뒤에 ?c=캐릭터이름 이 붙어 있으면 그 탭으로 열립니다. 없으면 첫 번째 캐릭터 탭으로 열립니다.
-  let currentTab = (new URLSearchParams(location.search).get('c') || '').trim() || CHARACTERS[0] || '전체';
+  let currentTab = (new URLSearchParams(location.search).get('c') || '').trim();
+  // 목록에 없는 이름이 주소에 들어와도 빈 화면이 되지 않도록 첫 탭으로 돌립니다.
+  if (currentTab !== '전체' && !CHARACTERS.includes(currentTab)) currentTab = CHARACTERS[0] || '전체';
 
   const IMG_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
 
@@ -345,6 +350,39 @@
     });
   });
 
+  // 프롬프트용 줄임 목록: 앞부분 주소를 한 번만 적고, 파일 이름은 한 줄에 하나씩 적습니다.
+  // 파일 이름의 공백 등은 주소에서 깨지지 않도록 미리 변환해 둡니다.
+  const listBtn = document.getElementById('listBtn');
+  function safeName(filename) {
+    return filename.replace(/[ %#?()\[\]{}]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  }
+  function promptList() {
+    if (!filteredFiles.length) return '';
+    // 캐릭터별로 묶어서, 반복되는 "캐릭터_" 와 ".png" 를 한 번만 적습니다.
+    const groups = {};
+    filteredFiles.forEach(f => { (groups[f.prefix] = groups[f.prefix] || []).push(f); });
+    const base = codeBase(filteredFiles[0]);
+    let out = `이미지 출력법: ![이름](${base}파일이름) 형식. 파일이름은 아래 [캐릭터] 줄의 앞 문구를 붙여 완성하고, 끝에 .png가 안 적혀 있으면 .png를 붙인다. 표기는 그대로, 글자를 바꾸지 않는다.\n`;
+    Object.keys(groups).forEach(c => {
+      const own = c !== '기타';
+      const items = groups[c].map(f => {
+        let n = own ? f.name.slice(c.length + 1) : f.name;
+        if (/\.png$/i.test(n)) n = n.replace(/\.png$/i, '');
+        return safeName(n);
+      });
+      out += own ? `[${c}] 앞에 ${c}_ 를 붙임\n${items.join(',')}\n` : `[기타] 이름 그대로\n${items.join(',')}\n`;
+    });
+    return out.trim();
+  }
+  listBtn.addEventListener('click', () => {
+    const text = promptList();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      listBtn.textContent = `복사됨! (${text.length.toLocaleString()}자)`;
+      setTimeout(() => { listBtn.textContent = '프롬프트용 목록 복사'; }, 2500);
+    });
+  });
+
   // ----- 이미지 크게 보기 (사진을 누르면 전체가 잘리지 않고 보입니다) -----
   const lightbox = document.getElementById('lightbox');
   const lbImg = document.getElementById('lbImg');
@@ -435,10 +473,17 @@
     const base = nameWithoutExt(filename);
     const k = base.indexOf('_');
     if (k > 0) {
-      const c = base.slice(0, k).trim();
-      if (CHARACTERS.includes(c)) return { char: c, label: base.slice(k + 1) };
+      const prefix = base.slice(0, k).trim();
+      const rest = base.slice(k + 1);
+      if (CHARACTERS.includes(prefix)) {
+        // 묶음 탭(예: 강다은과 강다인)에서 두 명이 함께 나오는 이미지는 "함께_" 로 표시해 개인 이미지와 구분합니다.
+        const grouped = Object.values(TAB_ALIASES).includes(prefix);
+        return { char: prefix, prefix, label: (grouped ? '함께_' : '') + rest };
+      }
+      const tab = TAB_ALIASES[prefix];
+      if (tab && CHARACTERS.includes(tab)) return { char: tab, prefix, label: prefix + '_' + rest };
     }
-    return { char: '기타', label: base };
+    return { char: '기타', prefix: '기타', label: base };
   }
 
   async function loadFiles() {
