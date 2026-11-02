@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>루네 이미지 갤러리</title>
+<script>
+  // ========================================================
+  // 설정 (바꿀 일이 생기면 이 부분만 고치세요)
+  //  - 이미지는 깃허브  images/루네/  폴더에 넣습니다. 파일 이름은 감정 이름만 써도 됩니다. 예) 기쁨.png
+  // ========================================================
+  const TITLE        = "루네";
+  const GITHUB_USER  = "tacowasabi123";
+  const GITHUB_REPO  = "crack_image";
+  const BRANCH       = "main";
+  const GALLERY_ROOT = "images/루네";
+  const PREFIX       = "";   // 파일 이름 앞에 붙는 문구가 있으면 적으세요 (루네 단독 스토리라 없음)
+</script>
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #f6f3fa; --panel: #ffffff; --line: #ddd3e8; --ink: #1e2a3a; --sub: #6b7c92;
+    --accent: #8a5cc4; --accent-d: #6c42a6; --soft: #efe8f7; --warm: #d4709a;
+  }
+  body { margin: 0; font-family: -apple-system, "Malgun Gothic", "맑은 고딕", sans-serif; background: var(--bg); color: var(--ink); }
+  header { padding: 28px 24px 18px; border-bottom: 1px solid var(--line); border-top: 4px solid var(--warm); background: var(--panel); }
+  .eyebrow { font-size: 12px; letter-spacing: 2px; color: var(--sub); text-transform: uppercase; }
+  h1 { margin: 4px 0 6px; font-size: 26px; color: var(--accent-d); }
+  .desc { color: var(--sub); font-size: 14px; }
+  .toolbar { display: flex; gap: 10px; padding: 18px 24px 8px; flex-wrap: wrap; }
+  input[type="text"] { flex: 1; min-width: 200px; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 14px; }
+  button.action { padding: 12px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; font-size: 14px; white-space: nowrap; font-family: inherit; }
+  button.action:hover { background: var(--soft); }
+  button.action.main { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  button.action.main:hover { background: var(--accent-d); }
+  button.action.copied { background: #6c42a6; color: #fff; }
+  .status { padding: 4px 24px 10px; font-size: 13px; color: var(--sub); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; padding: 10px 24px 40px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .thumb-wrap { aspect-ratio: 3 / 4; background: var(--soft); overflow: hidden; cursor: zoom-in; }
+  .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-name { padding: 10px 12px 12px; font-size: 14px; font-weight: 600; word-break: break-all; }
+  .copy-btn { margin: 0 10px 12px; padding: 9px; border-radius: 7px; border: none; background: var(--accent); color: #fff; cursor: pointer; font-size: 13px; font-family: inherit; }
+  .copy-btn:hover { background: var(--accent-d); }
+  .copy-btn.copied { background: #6c42a6; }
+  .empty, .error { padding: 60px 24px; text-align: center; color: var(--sub); grid-column: 1 / -1; }
+  .error { color: var(--accent-d); }
+  /* 크게 보기 */
+  .lb { position: fixed; inset: 0; z-index: 50; height: 100vh; height: 100dvh; background: rgba(15,25,38,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px; }
+  .lb[hidden] { display: none; }
+  .lb-stage { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; }
+  .lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+  .lb-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; padding-top: 12px; font-size: 14px; }
+  .lb-name { color: #fff; font-weight: 600; word-break: break-all; text-align: center; }
+  .lb-count { color: #c9dcee; font-size: 13px; }
+  .lb button { border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .lb button:hover { background: var(--soft); }
+  .lb-copy { padding: 8px 14px; }
+  .lb-copy.copied { background: #6c42a6; color: #fff; }
+  .lb-close { position: absolute; top: 12px; right: 12px; width: 42px; height: 42px; font-size: 22px; line-height: 1; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; font-size: 26px; }
+  .lb-prev { left: 8px; } .lb-next { right: 8px; }
+  @media (max-width: 560px) { .lb-nav { width: 36px; height: 52px; } .grid { padding: 10px 14px 40px; } .toolbar, header, .status { padding-left: 14px; padding-right: 14px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Image Gallery</div>
+  <h1 id="galleryTitle">이미지 갤러리</h1>
+  <div class="desc">이미지마다 코드를 복사하거나, 위쪽 버튼으로 프롬프트에 넣을 목록을 한 번에 복사하세요.</div>
+</header>
+
+<div class="toolbar">
+  <input type="text" id="searchBox" placeholder="파일명 검색 (예: 웃음, 분노)">
+  <button class="action" id="resetBtn">검색 초기화</button>
+  <button class="action main" id="promptBtn">프롬프트용 전체 복사</button>
+  <button class="action" id="copyAllBtn">이미지 코드 전체 복사</button>
+</div>
+<div class="status" id="statusLine">불러오는 중...</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="lb" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+  <button class="lb-close" id="lbClose" aria-label="닫기">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="이전 이미지">‹</button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="다음 이미지">›</button>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+  <div class="lb-bar">
+    <span class="lb-name" id="lbName"></span>
+    <span class="lb-count" id="lbCount"></span>
+    <button class="lb-copy" id="lbCopy">이미지 코드 복사</button>
+  </div>
+</div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const statusLine = document.getElementById('statusLine');
+  const searchBox = document.getElementById('searchBox');
+  const promptBtn = document.getElementById('promptBtn');
+  const copyAllBtn = document.getElementById('copyAllBtn');
+
+  let allFiles = [];
+  let filteredFiles = [];
+  const IMG_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
+  const isImage = n => IMG_EXT.some(e => n.toLowerCase().endsWith(e));
+  const stripExt = n => n.replace(/\.[^.]+$/, '');
+
+  const encPath = GALLERY_ROOT.split('/').map(encodeURIComponent).join('/');
+  const rawUrl = f => `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/${encPath}/${encodeURIComponent(f.name)}`;
+  const pagesBase = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}/${GALLERY_ROOT}/`;
+
+  // 공백·괄호·중괄호 등 깨질 수 있는 문자만 %XX 로 바꿉니다. ({user} 같은 글자는 크랙이 이름으로 바꿔 버립니다)
+  const safeName = s => s.replace(/[ %#?()\[\]{}]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  const altText = n => stripExt(n).replace(/[\[\]]/g, '');
+  const markdownCode = f => `![${altText(f.name)}](${pagesBase}${safeName(f.name)})`;
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+      ta.remove(); return ok;
+    }
+  }
+  function flash(btn, msg, orig) {
+    btn.textContent = msg; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+  }
+
+  // 프롬프트용 목록: 출력 형식 한 줄 + 이름을 쉼표로 이어 붙임 (파일 이름 앞에 캐릭터명이 없는 방식)
+  function promptText(list) {
+    const fmt = `이미지 출력법: ![이름](${pagesBase}파일이름) 형식으로 출력. 파일이름은 아래 목록의 이름에 .png 를 붙여 완성하고, %20 등의 표기는 글자 하나도 바꾸지 않는다.`;
+    return fmt + '\n' + list.map(f => safeName(stripExt(f.name))).join(',');
+  }
+
+  function render(list) {
+    grid.innerHTML = '';
+    if (!list.length) { grid.innerHTML = '<div class="empty">표시할 이미지가 없습니다.</div>'; return; }
+    list.forEach((file, idx) => {
+      const card = document.createElement('div'); card.className = 'card';
+      const tw = document.createElement('div'); tw.className = 'thumb-wrap';
+      const img = document.createElement('img'); img.src = rawUrl(file); img.loading = 'lazy'; img.alt = file.name;
+      tw.appendChild(img); tw.addEventListener('click', () => openLightbox(idx, tw));
+      const nm = document.createElement('div'); nm.className = 'card-name'; nm.textContent = file.label;
+      const btn = document.createElement('button'); btn.className = 'copy-btn'; btn.textContent = '이미지 코드 복사';
+      btn.addEventListener('click', async () => { if (await copyText(markdownCode(file))) flash(btn, '복사됨!', '이미지 코드 복사'); });
+      card.append(tw, nm, btn); grid.appendChild(card);
+    });
+  }
+
+  function applyFilter() {
+    const q = searchBox.value.trim().toLowerCase();
+    filteredFiles = q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles.slice();
+    statusLine.textContent = `${filteredFiles.length} / ${allFiles.length}개`;
+    render(filteredFiles);
+  }
+
+  searchBox.addEventListener('input', applyFilter);
+  document.getElementById('resetBtn').addEventListener('click', () => { searchBox.value = ''; applyFilter(); });
+
+  promptBtn.addEventListener('click', async () => {
+    if (!filteredFiles.length) return;
+    const t = promptText(filteredFiles);
+    if (await copyText(t)) {
+      flash(promptBtn, '복사됨! (' + t.length + '자)', '프롬프트용 전체 복사');
+      statusLine.textContent = `${filteredFiles.length}개 · 프롬프트용 목록 ${t.length}자 (크랙 캐릭터 프롬프트 한도 2000자)`;
+    }
+  });
+  copyAllBtn.addEventListener('click', async () => {
+    if (!filteredFiles.length) return;
+    if (await copyText(filteredFiles.map(markdownCode).join('\n'))) flash(copyAllBtn, '복사됨!', '이미지 코드 전체 복사');
+  });
+
+  // 크게 보기
+  const lightbox = document.getElementById('lightbox'), lbImg = document.getElementById('lbImg'),
+        lbName = document.getElementById('lbName'), lbCount = document.getElementById('lbCount'), lbCopy = document.getElementById('lbCopy');
+  let lbIndex = -1, lbOpener = null;
+  function showLightbox(i) {
+    if (!filteredFiles.length) return;
+    lbIndex = (i + filteredFiles.length) % filteredFiles.length;
+    const f = filteredFiles[lbIndex];
+    lbImg.src = rawUrl(f); lbImg.alt = f.name; lbName.textContent = f.label;
+    lbCount.textContent = (lbIndex + 1) + ' / ' + filteredFiles.length;
+    lbCopy.textContent = '이미지 코드 복사'; lbCopy.classList.remove('copied');
+  }
+  function openLightbox(i, opener) { lbOpener = opener || null; lightbox.hidden = false; document.body.style.overflow = 'hidden'; showLightbox(i); document.getElementById('lbClose').focus(); }
+  function closeLightbox() { lightbox.hidden = true; lbImg.removeAttribute('src'); document.body.style.overflow = ''; if (lbOpener && lbOpener.focus) lbOpener.focus(); }
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', () => showLightbox(lbIndex - 1));
+  document.getElementById('lbNext').addEventListener('click', () => showLightbox(lbIndex + 1));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox || e.target.id === 'lbStage') closeLightbox(); });
+  lbCopy.addEventListener('click', async () => { const f = filteredFiles[lbIndex]; if (f && await copyText(markdownCode(f))) flash(lbCopy, '복사됨!', '이미지 코드 복사'); });
+  document.addEventListener('keydown', e => {
+    if (lightbox.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(lbIndex - 1);
+    else if (e.key === 'ArrowRight') showLightbox(lbIndex + 1);
+  });
+  let touchX = null;
+  lightbox.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  lightbox.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+    if (Math.abs(dx) > 60) showLightbox(lbIndex + (dx < 0 ? 1 : -1));
+  });
+
+  async function loadFiles() {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${encPath}?ref=${BRANCH}`);
+      if (res.status === 404) allFiles = [];
+      else if (!res.ok) throw new Error(`저장소를 불러오지 못했습니다 (${res.status}). 레포 이름, 폴더 이름, Public 여부를 확인하세요.`);
+      else {
+        const data = await res.json();
+        allFiles = data.filter(it => it.type === 'file' && isImage(it.name))
+          .map(it => {
+            const base = stripExt(it.name);
+            return { name: it.name, label: PREFIX && base.startsWith(PREFIX) ? base.slice(PREFIX.length) : base };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name, 'ko', { numeric: true }));
+      }
+      applyFilter();
+    } catch (err) {
+      grid.innerHTML = `<div class="error">${err.message}</div>`;
+      statusLine.textContent = '';
+    }
+  }
+
+  document.title = TITLE + " 이미지 갤러리";
+  document.getElementById('galleryTitle').textContent = TITLE + " 이미지 갤러리";
+  loadFiles();
+</script>
+</body>
+</html>
