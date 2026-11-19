@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>최아린 이미지 갤러리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>
+  // ========================================================
+  // 설정
+  //  - 이미지는 클라우드플레어 R2 버킷의 폴더 하나에 모두 넣습니다. (주소: IMAGE_BASE + 파일이름)
+  //  - R2 는 깃허브처럼 파일 목록을 자동으로 읽어올 수 없어서, 아래 FILES 목록에 파일 이름을 직접 적어 둡니다.
+  //    새 이미지를 올리면 FILES 에 이름만 추가하면 됩니다. (확장자 포함)
+  //  - 파일 이름은  분류_이미지이름.png  형식입니다. 예) 마이수_기쁨.png
+  //    밑줄 _ 앞의 이름이 CHARACTERS 에 있으면 그 탭에 들어가고, 그 외(마이수·마이도_ 등)는 "기타" 탭에 들어갑니다.
+  //  - 주소 끝에 ?c=마이수 처럼 붙이면 그 탭으로 바로 열립니다. 없으면 첫 탭으로 열립니다.
+  // ========================================================
+  const TITLE        = "최아린";
+  const CHARACTERS   = ["최아린"];            // 캐릭터가 1명이면 탭 없이 전체만 보여줍니다
+  const IMAGE_BASE   = "https://taco.me.uk/최아린/";
+  const BRAND        = "최아린";              // 왼쪽 위 로고 글자
+  const SITE_URL     = "";                    // 로고를 누르면 가는 소개 페이지 (없으면 "")
+  const FILES = [
+    "최아린_69.png",
+    "최아린_가슴노출.png",
+    "최아린_가슴주무르기.png",
+    "최아린_걱정.png",
+    "최아린_겨드랑이.png",
+    "최아린_결혼사진.png",
+    "최아린_결혼사진앞.png",
+    "최아린_경멸.png",
+    "최아린_기쁨.png",
+    "최아린_기상.png",
+    "최아린_기승위.png",
+    "최아린_기승위절정.png",
+    "최아린_기승위키스.png",
+    "최아린_긴장.png",
+    "최아린_남편옆.png",
+    "최아린_넣어주세요.png",
+    "최아린_노팬티.png",
+    "최아린_놀람.png",
+    "최아린_눈가리개.png",
+    "최아린_눈가리고더블피스.png",
+    "최아린_눈물.png",
+    "최아린_다리들기.png",
+    "최아린_다리벌리기.png",
+    "최아린_답답.png",
+    "최아린_당황.png",
+    "최아린_대면좌위.png",
+    "최아린_들박.png",
+    "최아린_들박2.png",
+    "최아린_들킬뻔.png",
+    "최아린_딥스로트.png",
+    "최아린_레그락.png",
+    "최아린_리버스기승위1.png",
+    "최아린_리버스기승위2.png",
+    "최아린_마이크로비키니.png",
+    "최아린_머리채후배위.png",
+    "최아린_메이드복.png",
+    "최아린_모유.png",
+    "최아린_목욕.png",
+    "최아린_목조르기1.png",
+    "최아린_목조르기2.png",
+    "최아린_목줄건네기.png",
+    "최아린_목줄산책.png",
+    "최아린_몰래연락.png",
+    "최아린_무미건조.png",
+    "최아린_미소.png",
+    "최아린_미안함.png",
+    "최아린_민망.png",
+    "최아린_밀착좌위.png",
+    "최아린_밧줄.png",
+    "최아린_배보여주기.png",
+    "최아린_배쓰다듬기.png",
+    "최아린_부끄러움.png",
+    "최아린_부부침대.png",
+    "최아린_비웃음.png",
+    "최아린_빠직.png",
+    "최아린_삐짐.png",
+    "최아린_사후침대.png",
+    "최아린_샤워후.png",
+    "최아린_셀카.png",
+    "최아린_셔츠.png",
+    "최아린_속옷.png",
+    "최아린_손내밀어.png",
+    "최아린_쇼핑.png",
+    "최아린_수갑.png",
+    "최아린_수면.png",
+    "최아린_스탠딩체위1.png",
+    "최아린_스탠딩체위2.png",
+    "최아린_스탠딩한쪽다리.png",
+    "최아린_스팽킹.png",
+    "최아린_스팽킹자국.png",
+    "최아린_슬픔.png",
+    "최아린_아마존자세.png",
+    "최아린_안심.png",
+    "최아린_안아줘.png",
+    "최아린_알몸에이프런.png",
+    "최아린_야한셀카.png",
+    "최아린_얼굴사정후.png",
+    "최아린_엉덩이노출.png",
+    "최아린_엎드린후배위1.png",
+    "최아린_엎드린후배위2.png",
+    "최아린_역바니.png",
+    "최아린_오망꼬댄스.png",
+    "최아린_올라타기.png",
+    "최아린_요리.png",
+    "최아린_욕실섹스.png",
+    "최아린_욕조섹스.png",
+    "최아린_원격바이브1.png",
+    "최아린_원격바이브2.png",
+    "최아린_유혹.png",
+    "최아린_의심.png",
+    "최아린_임신거울.png",
+    "최아린_임신기승위.png",
+    "최아린_임신남편옆.png",
+    "최아린_임신절정.png",
+    "최아린_임신측위.png",
+    "최아린_임신테스트.png",
+    "최아린_임신후배위.png",
+    "최아린_입가리고웃기.png",
+    "최아린_입구벌리기.png",
+    "최아린_입벌려보여주기.png",
+    "최아린_자신만만.png",
+    "최아린_자위.png",
+    "최아린_자위들킴.png",
+    "최아린_재갈.png",
+    "최아린_전화.png",
+    "최아린_정상위1.png",
+    "최아린_정상위2.png",
+    "최아린_정상위3.png",
+    "최아린_정상위절정.png",
+    "최아린_젖소코스프레.png",
+    "최아린_젖은속옷.png",
+    "최아린_좌위키스.png",
+    "최아린_주방아일랜드.png",
+    "최아린_질내사정후.png",
+    "최아린_질투.png",
+    "최아린_쪼그려기승위.png",
+    "최아린_차안.png",
+    "최아린_착의후배위.png",
+    "최아린_취함.png",
+    "최아린_측위1.png",
+    "최아린_측위2.png",
+    "최아린_침대구속.png",
+    "최아린_카드.png",
+    "최아린_카섹스.png",
+    "최아린_커닐링구스.png",
+    "최아린_코트안알몸.png",
+    "최아린_콘돔물기.png",
+    "최아린_키스.png",
+    "최아린_키스마크가리기.png",
+    "최아린_탈의.png",
+    "최아린_통화섹스.png",
+    "최아린_파이즈리.png",
+    "최아린_팬티내리기.png",
+    "최아린_페이스시팅.png",
+    "최아린_펠라치오.png",
+    "최아린_풋잡.png",
+    "최아린_필라테스.png",
+    "최아린_필로우토크.png",
+    "최아린_핸드잡.png",
+    "최아린_호텔라운지.png",
+    "최아린_혼술.png",
+    "최아린_화남.png",
+    "최아린_후배위1.png",
+    "최아린_후배위2.png",
+    "최아린_후배위절정.png"
+  ];
+</script>
+<style>
+  :root{--bg:#EDF0F4;--paper:#FFFFFF;--ink:#1A2130;--sub:#7D879A;--line:#DCE1E8;--up:#E5334B;--down:#2C66F0;--soft:#EDF0F4;--accent:#1A2130;--accent-d:#000;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Pretendard Variable",Pretendard,system-ui,-apple-system,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;word-break:keep-all;-webkit-font-smoothing:antialiased}
+  button,input{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  a{color:inherit}
+  :focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+  header{position:sticky;top:0;z-index:20;background:rgba(237,240,244,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px;flex-wrap:wrap;padding:8px 20px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.02em;text-decoration:none}
+  .brand i{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--up) 50%,var(--down) 50%)}
+  .brand small{font-weight:600;color:var(--sub);font-size:14px}
+  .tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px;max-width:100%;overflow-x:auto}
+  .tab{padding:7px 12px;border-radius:9px;font-size:14px;font-weight:700;color:var(--sub);white-space:nowrap}
+  .tab:hover{background:var(--soft)}
+  .tab .n{font-weight:600;font-size:12.5px;margin-left:4px;opacity:.75}
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tab[data-c="0"][aria-selected="true"]{background:var(--up)}
+  .tab[data-c="1"][aria-selected="true"]{background:var(--down)}
+
+  .tools{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:20px 0 14px}
+  .tools h1{font-size:24px;font-weight:850;letter-spacing:-.035em}
+  .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .search{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:0 12px;min-width:220px}
+  .search input{border:0;background:transparent;padding:9px 0;width:100%;font-size:14.5px}
+  .search input:focus{outline:none}
+  button.action{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-size:14px;font-weight:700;white-space:nowrap}
+  button.action:hover{border-color:var(--ink)}
+  button.action.main{background:var(--ink);border-color:var(--ink);color:#fff}
+  button.action.main:hover{background:#000}
+  button.action.copied{background:var(--up);border-color:var(--up);color:#fff}
+  .status{font-size:13.5px;color:var(--sub);padding-bottom:12px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding-bottom:60px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .card:hover{border-color:var(--ink)}
+  .thumb-wrap{aspect-ratio:1216/832;background:var(--bg);overflow:hidden;cursor:zoom-in}
+  .thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .card-name{display:flex;align-items:center;gap:8px;padding:9px 11px;font-size:14px;font-weight:650;word-break:break-all}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--sub)}
+  .dot.su{background:var(--up)} .dot.do{background:var(--down)} .dot.duo{background:linear-gradient(90deg,var(--up) 50%,var(--down) 50%)}
+  .copy-btn{margin:0 10px 10px;padding:8px;border-radius:9px;background:var(--bg);color:var(--ink);font-size:13px;font-weight:700}
+  .copy-btn:hover{background:var(--ink);color:#fff}
+  .copy-btn.copied{background:var(--up);color:#fff}
+  .empty,.error{padding:60px 0;text-align:center;color:var(--sub);grid-column:1/-1}
+  .error{color:var(--up)}
+  /* 크게 보기 */
+  .lb{position:fixed;inset:0;z-index:50;height:100vh;height:100dvh;background:rgba(15,19,28,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px}
+  .lb[hidden]{display:none}
+  .lb-stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+  .lb-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .lb-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding-top:12px;font-size:14px}
+  .lb-name{color:#fff;font-weight:800;font-size:17px;word-break:break-all;text-align:center}
+  .lb-count{color:#b9c2d3;font-size:13px}
+  .lb button{background:#fff;color:var(--ink);border-radius:10px;font-weight:700;font-size:14px}
+  .lb-copy{padding:9px 14px}
+  .lb-copy.copied{background:var(--up)!important;color:#fff!important}
+  .lb-close{position:absolute;top:12px;right:12px;width:42px;height:42px;font-size:22px;line-height:1;border-radius:50%!important;background:rgba(255,255,255,.15)!important;color:#fff!important}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;font-size:24px;border-radius:50%!important;background:rgba(255,255,255,.15)!important;color:#fff!important}
+  .lb-nav:hover,.lb-close:hover{background:rgba(255,255,255,.3)!important}
+  .lb-prev{left:8px}.lb-next{right:8px}
+  @media(max-width:640px){.wrap{padding:0 14px}.bar{padding:8px 14px}.tabs{width:100%}.acts{width:100%}.search{min-width:0;flex:1 1 100%}.lb-nav{width:40px;height:40px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a class="brand" id="home"><i aria-hidden="true"></i><span id="brandName"></span> <small>이미지 갤러리</small></a>
+    <div class="tabs" id="tabs" role="tablist" aria-label="캐릭터 선택"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="tools">
+    <h1 id="galleryTitle">전체</h1>
+    <div class="acts">
+      <label class="search"><span aria-hidden="true">🔍</span><input type="search" id="searchBox" placeholder="이미지 이름 검색 (예: 기쁨, 후배위)" aria-label="이미지 이름 검색"></label>
+      <button class="action main" id="promptBtn">프롬프트용 전체 복사</button>
+      <button class="action" id="copyAllBtn">이미지 코드 전체 복사</button>
+    </div>
+  </div>
+  <p class="status" id="statusLine">불러오는 중...</p>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="lb" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+  <button class="lb-close" id="lbClose" aria-label="닫기">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="이전 이미지">‹</button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="다음 이미지">›</button>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+  <div class="lb-bar">
+    <span class="lb-name" id="lbName"></span>
+    <span class="lb-count" id="lbCount"></span>
+    <button class="lb-copy" id="lbCopy">이미지 코드 복사</button>
+  </div>
+</div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const statusLine = document.getElementById('statusLine');
+  const searchBox = document.getElementById('searchBox');
+  const promptBtn = document.getElementById('promptBtn');
+  const copyAllBtn = document.getElementById('copyAllBtn');
+
+  let allFiles = [];
+  let filteredFiles = [];
+  const SINGLE = CHARACTERS.length <= 1;   // 캐릭터 1명이면 탭 숨김
+  const TAB_LABEL = { '기타': '둘이 함께' };   // 화면에 보이는 탭 이름 (기타 → 둘이 함께)
+  const tabLabel = n => TAB_LABEL[n] || n;
+  let currentTab = (new URLSearchParams(location.search).get('c') || decodeURIComponent(location.hash.slice(1)) || '').trim();
+  if (currentTab === '함께' || currentTab === '둘이 함께') currentTab = '기타';
+  if (currentTab !== '전체' && currentTab !== '기타' && !CHARACTERS.includes(currentTab)) currentTab = CHARACTERS[0];
+  if (SINGLE) currentTab = '전체';
+  const IMG_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
+  const isImage = n => IMG_EXT.some(e => n.toLowerCase().endsWith(e));
+  const stripExt = n => n.replace(/\.[^.]+$/, '');
+
+  const rawUrl = f => encodeURI(IMAGE_BASE) + encodeURIComponent(f.name);
+  const pagesBase = IMAGE_BASE;
+
+  // 공백·괄호·중괄호 등 깨질 수 있는 문자만 %XX 로 바꿉니다. ({user} 같은 글자는 크랙이 이름으로 바꿔 버립니다)
+  const safeName = s => s.replace(/[ %#?()\[\]{}]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  const altText = n => stripExt(n).replace(/[\[\]]/g, '');
+  const markdownCode = f => `![${altText(f.name)}](${pagesBase}${safeName(f.name)})`;
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+      ta.remove(); return ok;
+    }
+  }
+  function flash(btn, msg, orig) {
+    btn.textContent = msg; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+  }
+
+  // 프롬프트용 목록: 출력 형식 한 줄 + 앞 문구(분류)별로 묶은 이름 목록
+  function promptText(list) {
+    const fmt = `이미지 출력법: ![이름](${pagesBase}파일이름) 형식으로 출력. 파일이름은 아래 [분류] 줄의 앞 문구를 붙이고 .png 를 붙여 완성하고, %20 등의 표기는 글자 하나도 바꾸지 않는다.`;
+    const groups = {};
+    list.forEach(f => { (groups[f.prefix] = groups[f.prefix] || []).push(f); });
+    const order = [...CHARACTERS, ...Object.keys(groups).filter(k => !CHARACTERS.includes(k))];
+    const lines = [fmt];
+    order.filter(k => groups[k]).forEach(k => {
+      const arr = groups[k];
+      if (k) {
+        lines.push(`[${k}] 앞에 ${k}_ 를 붙임`);
+        lines.push(arr.map(f => safeName(f.rest)).join(','));
+      } else {
+        lines.push('[앞 문구 없음]');
+        lines.push(arr.map(f => safeName(stripExt(f.name))).join(','));
+      }
+    });
+    return lines.join('\n');
+  }
+
+  function renderTabs() {
+    const box = document.getElementById('tabs');
+    box.innerHTML = '';
+    if (SINGLE) { box.style.display = 'none'; return; }
+    [...CHARACTERS, '기타', '전체'].forEach(name => {
+      const n = name === '전체' ? allFiles.length : allFiles.filter(f => f.tab === name).length;
+      const b = document.createElement('button');
+      b.className = 'tab';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', name === currentTab ? 'true' : 'false');
+      const ci = CHARACTERS.indexOf(name); if (ci >= 0) b.dataset.c = ci;
+      b.appendChild(document.createTextNode(tabLabel(name)));
+      const c = document.createElement('span'); c.className = 'n'; c.textContent = n; b.appendChild(c);
+      b.addEventListener('click', () => {
+        currentTab = name; renderTabs(); applyFilter();
+        try { history.replaceState(null, '', '?c=' + encodeURIComponent(name)); } catch (e) {}
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function render(list) {
+    grid.innerHTML = '';
+    if (!list.length) { grid.innerHTML = '<div class="empty">표시할 이미지가 없습니다.</div>'; return; }
+    list.forEach((file, idx) => {
+      const card = document.createElement('div'); card.className = 'card';
+      const tw = document.createElement('div'); tw.className = 'thumb-wrap';
+      const img = document.createElement('img'); img.src = rawUrl(file); img.loading = 'lazy'; img.alt = file.name;
+      tw.appendChild(img); tw.addEventListener('click', () => openLightbox(idx, tw));
+      const nm = document.createElement('div'); nm.className = 'card-name';
+      const ci = CHARACTERS.indexOf(file.prefix);
+      const dot = document.createElement('span'); dot.className = 'dot ' + (ci === 0 ? 'su' : ci === 1 ? 'do' : 'duo');
+      const nmText = document.createElement('span'); nmText.textContent = (currentTab === '전체' || currentTab === '기타') ? file.prefix + (file.prefix ? '_' : '') + file.label : file.label;
+      nm.append(dot, nmText);
+      const btn = document.createElement('button'); btn.className = 'copy-btn'; btn.textContent = '이미지 코드 복사';
+      btn.addEventListener('click', async () => { if (await copyText(markdownCode(file))) flash(btn, '복사됨!', '이미지 코드 복사'); });
+      card.append(tw, nm, btn); grid.appendChild(card);
+    });
+  }
+
+  function applyFilter() {
+    const q = searchBox.value.trim().toLowerCase();
+    const pool = currentTab === '전체' ? allFiles : allFiles.filter(f => f.tab === currentTab);
+    filteredFiles = q ? pool.filter(f => f.name.toLowerCase().includes(q)) : pool.slice();
+    document.getElementById('galleryTitle').textContent = SINGLE ? TITLE : tabLabel(currentTab);
+    statusLine.textContent = `${filteredFiles.length} / ${pool.length}개`;
+    render(filteredFiles);
+  }
+
+  searchBox.addEventListener('input', applyFilter);
+
+  promptBtn.addEventListener('click', async () => {
+    if (!filteredFiles.length) return;
+    const t = promptText(filteredFiles);
+    if (await copyText(t)) {
+      flash(promptBtn, '복사됨! (' + t.length + '자)', '프롬프트용 전체 복사');
+      statusLine.textContent = `${tabLabel(currentTab)} ${filteredFiles.length}개 · 프롬프트용 목록 ${t.length}자 (크랙 캐릭터 프롬프트 한도 2000자)`;
+    }
+  });
+  copyAllBtn.addEventListener('click', async () => {
+    if (!filteredFiles.length) return;
+    if (await copyText(filteredFiles.map(markdownCode).join('\n'))) flash(copyAllBtn, '복사됨!', '이미지 코드 전체 복사');
+  });
+
+  // 크게 보기
+  const lightbox = document.getElementById('lightbox'), lbImg = document.getElementById('lbImg'),
+        lbName = document.getElementById('lbName'), lbCount = document.getElementById('lbCount'), lbCopy = document.getElementById('lbCopy');
+  let lbIndex = -1, lbOpener = null;
+  function showLightbox(i) {
+    if (!filteredFiles.length) return;
+    lbIndex = (i + filteredFiles.length) % filteredFiles.length;
+    const f = filteredFiles[lbIndex];
+    lbImg.src = rawUrl(f); lbImg.alt = f.name; lbName.textContent = f.prefix ? f.prefix + ' / ' + f.label : f.label;
+    lbCount.textContent = (lbIndex + 1) + ' / ' + filteredFiles.length;
+    lbCopy.textContent = '이미지 코드 복사'; lbCopy.classList.remove('copied');
+  }
+  function openLightbox(i, opener) { lbOpener = opener || null; lightbox.hidden = false; document.body.style.overflow = 'hidden'; showLightbox(i); document.getElementById('lbClose').focus(); }
+  function closeLightbox() { lightbox.hidden = true; lbImg.removeAttribute('src'); document.body.style.overflow = ''; if (lbOpener && lbOpener.focus) lbOpener.focus(); }
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', () => showLightbox(lbIndex - 1));
+  document.getElementById('lbNext').addEventListener('click', () => showLightbox(lbIndex + 1));
+  lightbox.addEventListener('click', e => { if (e.target === lightbox || e.target.id === 'lbStage') closeLightbox(); });
+  lbCopy.addEventListener('click', async () => { const f = filteredFiles[lbIndex]; if (f && await copyText(markdownCode(f))) flash(lbCopy, '복사됨!', '이미지 코드 복사'); });
+  document.addEventListener('keydown', e => {
+    if (lightbox.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(lbIndex - 1);
+    else if (e.key === 'ArrowRight') showLightbox(lbIndex + 1);
+  });
+  let touchX = null;
+  lightbox.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  lightbox.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+    if (Math.abs(dx) > 60) showLightbox(lbIndex + (dx < 0 ? 1 : -1));
+  });
+
+  function loadFiles() {
+    allFiles = FILES.filter(isImage)
+      .map(name => {
+        const base = stripExt(name), k = base.indexOf('_');
+        const prefix = k > 0 ? base.slice(0, k).trim() : '';
+        const rest = k > 0 ? base.slice(k + 1) : base;
+        const own = CHARACTERS.includes(prefix);
+        return { name, prefix, rest, label: rest, tab: own ? prefix : '기타' };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, 'ko', { numeric: true }));
+    renderTabs();
+    applyFilter();
+  }
+
+  document.title = TITLE + " 이미지 갤러리";
+  document.getElementById('brandName').textContent = BRAND;
+  if (SITE_URL) document.getElementById('home').href = SITE_URL;
+  renderTabs();
+  loadFiles();
+</script>
+</body>
+</html>
